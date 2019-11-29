@@ -42,7 +42,7 @@
 */
 
 
-#include "../../std_lib_facilities.h"
+#include "../std_lib_facilities.h"   //removed leading "../ for Visual Studio 2019
 
 //------------------------------------------------------------------------------
 
@@ -148,31 +148,56 @@ struct Variable {
 	Variable(string n, double v) :name(n), value(v) { }
 };
 
-vector<Variable> names;
 
-double get_value(string s)
+class Symbol_table {
+	vector<Variable> var_table;
+public:
+	double get(string s) {}
+	void set(string , double) {}
+	bool is_declared(string s) {}
+	void declare(Variable) {}
+};
+
+
+Symbol_table variables;
+
+//vector<Variable> names;
+
+
+
+double Symbol_table::get(string s)
 {
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return names[i].value;
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return var_table[i].value;
 	error("get: undefined name ", s);
 }
 
-void set_value(string s, double d)
+void Symbol_table::set(string s, double d)
 {
-	for (int i = 0; i <= names.size(); ++i)
-		if (names[i].name == s) {
-			names[i].value = d;
+	for (int i = 0; i <= var_table.size(); ++i)
+		if (var_table[i].name == s) {
+			var_table[i].value = d;
 			return;
 		}
 	error("set: undefined name ", s);
 }
 
-bool is_declared(string s)
+bool Symbol_table::is_declared(string s)
 {
-	for (int i = 0; i < names.size(); ++i)
-		if (names[i].name == s) return true;
+	for (int i = 0; i < var_table.size(); ++i)
+		if (var_table[i].name == s) return true;
 	return false;
 }
+
+void Symbol_table::declare(Variable v) {
+	if (!variables.is_declared(v.name)) {
+		variables.var_table.push_back(v);
+		return;
+	}
+	error("Cannot declare existing variable.");
+}
+
+
 
 Token_stream ts;
 double expression(Token_stream& );
@@ -209,7 +234,7 @@ double primary(Token_stream& ts)
 	case number:
 		return t.value;  //if a number return the number
 	case name:
-		return get_value(t.name); //if it is a variable in an expression get_value of variable
+		return variables.get(t.name); //if it is a variable in an expression get_value of variable
 	/*
 	case ')':
 		if (is_pwr = true) {
@@ -278,12 +303,12 @@ double declaration(Token_stream& ts)
 	Token t = ts.get();
 	if (t.kind != 'a') error("name expected in declaration");  // 'a' is the identifier for a variable name
 	string name = t.name;                          //variable name
-	if (is_declared(name)) error(name, " declared twice");  //if this variable is already declared
+	if (variables.is_declared(name)) error(name, " declared twice");  //if this variable is already declared
 	Token t2 = ts.get();  //get another token.  should be an "=" sign if user typed correctly.
 	if (t2.kind != '=') error("= missing in declaration of ", name);
 	double d = expression(ts);  // if it gets here it is a correctly formatted expression that 
 	                          // needs to be returned
-	names.push_back(Variable(name, d));  //  add this variable to the variable table vector
+	variables.declare(Variable(name, d));  //  add this variable to the variable table vector
 	return d;
 }
 
