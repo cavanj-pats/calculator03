@@ -152,10 +152,10 @@ struct Variable {
 class Symbol_table {
 	vector<Variable> var_table;
 public:
-	double get(string s) {}
-	void set(string , double) {}
-	bool is_declared(string s) {}
-	void declare(Variable) {}
+	double get(string s);
+	void set(string, double);
+	bool is_declared(string s);
+	void declare(Variable);
 };
 
 
@@ -374,8 +374,18 @@ void calculate()
 }
 
 int main()
-
+	
 try {
+	string menu = "Calculator Program.\n";
+	menu += "Enter an expression followed by semicolon ';' and press enter.\n";
+	menu += "Expressions of the form (8+(8+9)/3); are acceptable.\n";
+	menu += "Define variables using 'let'. For example 'let pi=3.14' is valid.\n";
+	menu += "Use of standard C++ functions 'pow' and 'sqrt' are also supported. \n";
+	menu += "Use 'quit;' to exit.\n";
+	menu += "\n";
+
+	cout << menu;
+
 	calculate();  //call the calculate function with loop
 	return 0;
 }
