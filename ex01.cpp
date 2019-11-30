@@ -71,6 +71,7 @@ public:
 
 const char let = 'L';
 const char quit = 'Q';
+const char help = 'H';
 const char print = ';';
 const char number = '8';
 const char name = 'a';
@@ -121,6 +122,7 @@ Token Token_stream::get()
 			if (s == "sqrt") return Token(squareroot);
 			if (s == "pow") return Token(power);
 			if (s == "quit") return Token(quit);  //replaced name with quit
+			if (s == "help") return Token(help);
 			return Token(name, s);  //if it gets here it is not an expression
 			                        //and it is not a number
 			                        // it is not let nor quit.  it is a variable name 
@@ -349,6 +351,20 @@ double statement(Token_stream& ts)
 	}
 }
 
+void print_help() {
+	system("cls");
+
+	string menu = "Calculator Program.\n";
+	menu += "Enter an expression followed by semicolon ';' and press enter.\n";
+	menu += "Expressions of the form (8+(8+9)/3); are acceptable.\n";
+	menu += "Define variables using 'let'. For example 'let pi=3.14' is valid.\n";
+	menu += "Use of standard C++ functions 'pow' and 'sqrt' are also supported. \n";
+	menu += "Use 'quit;' to exit.\n";
+	menu += "\n";
+	cout << menu;
+	
+}
+
 void clean_up_mess()
 {
 	ts.ignore(print);
@@ -363,7 +379,12 @@ void calculate()
 		cout << prompt;
 		Token t = ts.get();  //get a token 
 		while (t.kind == print) t = ts.get(); //print is ;. if ; get another
+		if (t.kind == help) {
+			print_help();
+			calculate();
+		}
 		if (t.kind == quit) return; //if quit, retun back to main
+		
 		ts.unget(t);  //not quit or print so put it back
 		cout << result << statement(ts) << endl;   //determine what statement we have
 	}
@@ -376,16 +397,8 @@ void calculate()
 int main()
 	
 try {
-	string menu = "Calculator Program.\n";
-	menu += "Enter an expression followed by semicolon ';' and press enter.\n";
-	menu += "Expressions of the form (8+(8+9)/3); are acceptable.\n";
-	menu += "Define variables using 'let'. For example 'let pi=3.14' is valid.\n";
-	menu += "Use of standard C++ functions 'pow' and 'sqrt' are also supported. \n";
-	menu += "Use 'quit;' to exit.\n";
-	menu += "\n";
-
-	cout << menu;
-
+	
+	print_help();
 	calculate();  //call the calculate function with loop
 	return 0;
 }
